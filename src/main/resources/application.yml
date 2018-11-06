@@ -1,0 +1,22 @@
+#服务器&项目
+server:
+  port: 8080
+  #编码格式
+  tomcat:
+    uri-encoding: UTF-8
+  servlet:
+    context-path: /Community
+#mysql数据库 和 redis
+spring:
+  profiles:
+    active: dev
+  aop:
+    proxy-target-class: false
+mybatis:
+  mapper-locations: classpath:mapper/*/*.xml
+  type-aliases-package: com.manager.core.model, com.manager.shop.model
+  configuration:
+    map-underscore-to-camel-case: true # 驼峰命名转换
+
+#####消息队列#####
+max-size: 2

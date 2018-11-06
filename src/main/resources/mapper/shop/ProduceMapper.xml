@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.manager.shop.dao.ProduceDao">
+    <sql id="columns">
+        PRODUCE.*,
+        PRODUCE_TYPE.TYPE_NAME,
+        SHOP.SHOP_NAME
+    </sql>
+    <sql id="table">
+	    PRODUCE
+    </sql>
+    <sql id="PRODUCE_TYPE">
+        LEFT JOIN PRODUCE_TYPE ON PRODUCE.PRODUCE_TYPE = PRODUCE_TYPE.TYPE_ID
+    </sql>
+
+    <sql id="SHOP">
+        LEFT JOIN SHOP ON PRODUCE.BELONG_SHOP_ID = SHOP.SHOP_ID
+    </sql>
+
+    
+    <resultMap id="produceList" type="Produce">
+        <result column="SHOP_NAME" property="belongShopName" jdbcType="VARCHAR" javaType="java.lang.String"/>
+        <result column="TYPE_NAME" property="produceType" jdbcType="VARCHAR" javaType="java.lang.String"/>
+    </resultMap>
+
+    <!-- 1.查找单个详情 -->
+    <select id="get" parameterType="Long" resultMap="produceList">
+        SELECT
+	        <include refid="columns" />
+        FROM
+            <include refid="table" />
+        <include refid="PRODUCE_TYPE" />
+        <include refid="SHOP" />
+        WHERE
+	        PRODUCE.PRODUCE_ID= #{produceId}
+    </select>
+
+    <!-- 2.根据条件查询多个 -->
+    <select id="getList"  parameterType="java.util.Map" resultMap="produceList">
+        SELECT
+            <include refid="columns" />
+        FROM
+            <include refid="table" />
+        <include refid="PRODUCE_TYPE" />
+        <include refid="SHOP" />
+        <where>
+            <if test="typeName != null">
+                and PRODUCE_TYPE.TYPE_NAME like #{typeName}
+            </if>
+            <if test="shopName != null">
+                and SHOP.SHOP_NAME like #{shopName}
+            </if>
+        </where>
+        <!-- 排序方式 , 默认按销量降序 -->
+        ORDER BY
+            <choose>
+                <when test="orderItem != null">
+                    ${orderItem}
+                </when>
+                <otherwise>
+                    PRODUCE.PRODUCE_SELL
+                </otherwise>
+            </choose>
+
+            <choose>
+                <when test="orderType != null">
+                    ${orderType}
+                </when>
+                <otherwise>
+                    desc
+                </otherwise>
+            </choose>
+    </select>
+
+    <!-- 3.根据订单id查询多个 -->
+    <select id="getListByOrderId"  parameterType="Long" resultMap="produceList">
+        SELECT
+            PRODUCE.*
+        FROM PRODUCE,ORDER_PRODUCE
+        WHERE
+            ORDER_PRODUCE.PRODUCE_ID = PRODUCE.PRODUCE_ID
+          AND
+            ORDER_PRODUCE.ORDER_ID = #{orderId}
+    </select>
+
+</mapper>

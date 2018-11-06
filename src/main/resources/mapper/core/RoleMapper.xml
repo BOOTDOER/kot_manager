@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.manager.core.dao.RoleDao">
+    <sql id="columns">
+        ROLE.ROLE_ID,
+        ROLE.ROLE_NAME
+    </sql>
+    <sql id="table">
+	    ROLE
+    </sql>
+    <sql id="RELATIONSHIP">
+        LEFT JOIN USER_ROLE ON ROLE.ROLE_ID = USER_ROLE.ROLE_ID
+    </sql>
+
+    <!-- 1.查找多个-->
+    <select id="getList" parameterType="Long" resultType="Role">
+        SELECT
+            <include refid="columns" />
+        FROM
+            <include refid="table" />
+        <include refid="RELATIONSHIP" />
+        WHERE
+            USER_ROLE.USER_ID = #{userId}
+    </select>
+
+
+</mapper>

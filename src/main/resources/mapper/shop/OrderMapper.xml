@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.manager.shop.dao.OrderDao">
+    <sql id="columns">
+        ORDER_ID,
+        ORDER_USER_ID,
+        ORDER_SHOP_ID,
+        ORDER_COURIER_ID,
+        ORDER_REMARKS,
+        ORDER_TIME,
+        ORDER_STATE
+    </sql>
+    <sql id="table">
+	    `ORDER`
+    </sql>
+    <!-- 关系表 -->
+    <sql id="relationTable">
+	    ORDER_PRODUCE
+    </sql>
+    <!-- id字段 -->
+    <sql id="idField">
+	    ORDER_ID
+    </sql>
+    <!-- 关系字段 -->
+    <sql id="relationField">
+	    PRODUCE_ID
+    </sql>
+
+    <sql id="ORDER_COURIER_ID">
+        LEFT JOIN SYS_USER ON `ORDER`.ORDER_COURIER_ID = SYS_USER.USER_ID
+    </sql>
+
+    <resultMap id="orderList" type="Order">
+        <result column="ORDER_SHOP_ID" property="orderShopId" jdbcType="BIGINT" javaType="java.lang.Long"/>
+        <result column="ORDER_COURIER_ID" property="orderCourierId" jdbcType="BIGINT" javaType="java.lang.Long"/>
+        <collection property="produceList"
+                    column="ORDER_ID"
+                    select="com.manager.shop.dao.ProduceDao.getListByOrderId" />
+    </resultMap>
+
+    <!-- 查找单个详情 -->
+    <select id="get" parameterType="Long" resultMap="orderList">
+        SELECT
+	        <include refid="columns" />
+        FROM
+            <include refid="table" />
+        <include refid="ORDER_COURIER_ID" />
+        WHERE
+            `ORDER`.ORDER_ID = #{orderId}
+    </select>
+
+    <!-- 更新单个详情 -->
+    <update id="update" parameterType="Order">
+        UPDATE
+            <include refid="table" />
+        SET
+            <if test="orderCourierId != null">
+                orderCourierId = #{orderCourierId}
+            </if>
+                <if test="orderRemarks != null">
+                orderRemarks = #{orderRemarks}
+            </if>
+            <if test="orderState != null">
+                orderState = #{orderState}
+            </if>
+    </update>
+
+    <!-- 删除订单对应商品信息 -->
+    <delete id="deleteProduces" parameterType="Long">
+        DELETE FROM
+            <include refid="relationTable" />
+        WHERE
+            <include refid="idField" /> =#{orderId}
+    </delete>
+
+    <!-- 添加订单对应商品信息 -->
+    <insert id="insertDetail" parameterType="Map">
+        INSERT INTO
+            <include refid="relationTable" />
+        <foreach item="detail" collection="orderList" separator=",">
+            (
+            #{detail.orderId}
+            #{detail.produceId}
+            )
+        </foreach>
+    </insert>
+
+</mapper>

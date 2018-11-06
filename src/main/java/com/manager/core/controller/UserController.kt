@@ -1,8 +1,8 @@
 package com.manager.core.controller
 
 import com.manager.common.log.Log
-import com.manager.common.queue.MQueueItem
-import com.manager.common.queue.MQueueService
+import com.manager.common.queue.TQueueItem
+import com.manager.common.queue.TQueueService
 import com.manager.common.shiro.util.ShiroUtils
 import com.manager.core.model.SysUser
 import com.manager.core.service.UserService
@@ -17,7 +17,7 @@ open class UserController {
     open val userService: UserService? = null
 
     companion object {
-        private val queue = MQueueService.instance
+        private val queue = TQueueService.instance
     }
 
     @Log("同步测试")
@@ -32,7 +32,7 @@ open class UserController {
         val param = HashMap<String, Any>()
         param.put("param", message)
         //将内容放入消息队列
-        queue.put(MQueueItem(sessionId = ShiroUtils.subjct.session.id as String,
+        queue.put(TQueueItem(sessionId = ShiroUtils.subjct.session.id as String,
                              methodName = userService!!::getList,
                              param = param))
 

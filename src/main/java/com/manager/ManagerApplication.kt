@@ -1,6 +1,6 @@
 package com.manager
 
-import com.manager.common.queue.MQueueService
+import com.manager.common.queue.TQueueService
 import org.mybatis.spring.annotation.MapperScan
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
@@ -19,7 +19,7 @@ open class ManagerApplication {
 fun main(args: Array<String>) {
 
     //开启消息队列
-    MQueueService.instance.start()
+    TQueueService.instance.start()
 
     runApplication<ManagerApplication>(*args)
 

@@ -13,7 +13,7 @@ open class ProduceController{
     @Autowired
     private val produceService:ProduceService? = null
 
-    @GetMapping("/getAllProduces")
+    @GetMapping("/produceList")
     private fun getAllProduces(@RequestParam map : HashMap<String, Any>) : List<Produce> {
         return  produceService!!.getList(map)
     }

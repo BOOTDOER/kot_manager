@@ -21,7 +21,7 @@ open class UserController {
     }
 
     @Log("同步测试")
-    @RequestMapping("/getAll")
+    @RequestMapping("/UserList")
     protected open fun getAll(@RequestParam map: HashMap<String, Any>) : List<SysUser> {
         return userService!!.getList(map)
     }

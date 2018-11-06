@@ -14,13 +14,13 @@ open class ProduceServiceImpl : ProduceService {
     @Autowired
     private val produceDao : ProduceDao ?= null
 
-    @Cacheable(key="#map")
+    @Cacheable(key="#map", unless="#result == null")
     override fun getList(map : HashMap<String, Any>): List<Produce> {
         println("缓存中暂无该数据")
         return produceDao!!.getList(map)
     }
 
-    @Cacheable(key="#ProduceId")
+    @Cacheable(key="#produceId", unless="#result == null")
     override fun get(produceId: Long): Produce {
         println("缓存中暂无该数据")
         return produceDao!!.get(produceId)

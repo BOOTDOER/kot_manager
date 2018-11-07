@@ -23,6 +23,4 @@ open class ProduceController{
         return produceService!!.get(produceId)
     }
 
-
-
 }

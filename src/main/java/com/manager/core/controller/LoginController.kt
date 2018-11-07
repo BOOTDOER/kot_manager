@@ -2,6 +2,10 @@ package com.manager.core.controller
 
 import com.manager.common.log.Log
 import com.manager.common.shiro.util.ShiroUtils
+import io.swagger.annotations.Api
+import io.swagger.annotations.ApiImplicitParam
+import io.swagger.annotations.ApiImplicitParams
+import io.swagger.annotations.ApiOperation
 import org.apache.shiro.SecurityUtils
 import org.apache.shiro.authc.AuthenticationException
 import org.apache.shiro.authc.LockedAccountException
@@ -16,6 +20,7 @@ import java.util.HashMap
  * @Date 2018/10/23 19:44
  * @Version v1.0
  */
+@Api(tags= ["登录相关"])
 @RestController
 open class LoginController {
     /**
@@ -25,6 +30,12 @@ open class LoginController {
      * @return
      */
     @Log("登录")
+    @ApiOperation("登录")
+    @ApiImplicitParams(
+        ApiImplicitParam(name = "userName", value = "用户名", dataType = "String"),
+        ApiImplicitParam(name = "userPwd", value = "密码", dataType = "Long"),
+        ApiImplicitParam(name = "rememberMe", value = "记住密码", dataType = "boolean")
+    )
     @PostMapping("/login.html")
     protected open fun login(@RequestParam("userName") userName: String, @RequestParam("userPwd") userPwd: String, @RequestParam(value = "rememberMe", defaultValue = "false") rememberMe: Boolean): Map<String, Any> {
         val subject = SecurityUtils.getSubject()
@@ -51,6 +62,7 @@ open class LoginController {
     }
 
     @Log("注销")
+    @ApiOperation("注销")
     @GetMapping("/logout")
     protected open fun logout(): String {
         ShiroUtils.logout()

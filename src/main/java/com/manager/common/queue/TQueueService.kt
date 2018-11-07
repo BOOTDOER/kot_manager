@@ -15,16 +15,16 @@ import java.util.concurrent.LinkedBlockingQueue
  *
  *  1.fun start() : 开启 【处理队列】 线程 监听
  *
- *  2.fun put(T) ： 放入队列
+ *  2.fun put(obj: Task) ： 将任务放入队列
  *
- *  3.class QueueHandler : 队列元素处理方式
+ *  3.class QueueHandler : 任务处理方式
  *
- *  4.fun resultHandler() : 队列元素处理结果 的 处理方法   可通过WebSocket返回客户端 or 记录日志 or ...
+ *  4.fun resultHandler() : 对【任务处理结果】的 处理方法   可通过WebSocket返回客户端 or 记录日志 or ...
  *
  *  @author lin
  *  @version 1.0
  */
-class TQueueService<T>: LinkedBlockingQueue<TQueueItem>() {
+class TQueueService<T>: LinkedBlockingQueue<Task>() {
     private var flag = false
 
     companion object {
@@ -51,8 +51,8 @@ class TQueueService<T>: LinkedBlockingQueue<TQueueItem>() {
                     //execute() :
                     val obj = take()
                     val result = es.submit(
-                            QueueHandler<T>(obj.methodName as (T) -> Unit,
-                            obj.param as T?)).get()
+                            QueueHandler<T>(obj.methodName as (T) -> Any,
+                                    obj.param as T?)).get()
                     //根据result选择发送不同数据到客户端
                     resultHandler(obj.sessionId, result)
                 } catch (e: InterruptedException) {
@@ -71,7 +71,7 @@ class TQueueService<T>: LinkedBlockingQueue<TQueueItem>() {
     }
 
     /**
-     * 线程处理结果处理方法 , 此处用 WebSocket 处理
+     * 对【任务处理结果】的处理方法 , 此处用 WebSocket 处理
      */
     private fun resultHandler(sessionId: String? , result: T): Any? {
         //发送给该客户端
@@ -82,11 +82,11 @@ class TQueueService<T>: LinkedBlockingQueue<TQueueItem>() {
     }
 
     /**
-     * 队列处理方法
-     *      Callable 代替 Runnable
+     * 任务处理方法
+     *      此处用 Callable 代替 Runnable
      *      前可以者返回值，用来判断任务执行结果
      */
-    class QueueHandler<T>(private val method: (T) -> Unit,
+    class QueueHandler<T>(private val method: (T) -> Any,
                           private val item: T? =null) : Callable<T> {
 
         /**
